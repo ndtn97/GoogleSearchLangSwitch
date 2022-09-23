@@ -1,0 +1,39 @@
+{
+    "name": "Google Lang Switch",
+    "description": "",
+    "version": "0.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "/js/background.js"
+    },
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "eng_search",
+                "enabled": true,
+                "path": "/rules/eng_search.json"
+            },
+            {
+                "id": "normal_search",
+                "enabled": false,
+                "path": "/rules/normal_search.json"
+            }
+        ]
+    },
+    "permissions": [
+        "declarativeNetRequest"
+    ],
+    "host_permissions": [
+        "*://www.google.com/search*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://www.google.com/search*"
+            ],
+            "js": [
+                "/js/page.js"
+            ]
+        }
+    ]
+}

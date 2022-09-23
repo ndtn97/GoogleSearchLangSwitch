@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "action": {
+            "type": "redirect",
+            "redirect": {
+                "transform": {
+                    "queryTransform": {
+                        "addOrReplaceParams": [
+                            {
+                                "key": "gl",
+                                "value": "us"
+                            },
+                            {
+                                "key": "hl",
+                                "value": "en"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "condition": {
+            "urlFilter": "google.com",
+            "resourceTypes": [
+                "main_frame"
+            ]
+        }
+    }
+]
