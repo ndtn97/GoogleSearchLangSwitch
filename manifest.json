@@ -23,6 +23,6 @@
         }
     ],
     "action": {
-        "default_icon": "/images/icon_off.png"
+        "default_icon": "/images/icon.png"
     }
 }
