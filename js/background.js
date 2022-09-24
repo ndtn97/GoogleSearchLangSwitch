@@ -59,6 +59,14 @@ chrome.declarativeNetRequest.updateSessionRules(
     }
 )
 
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    chrome.declarativeNetRequest.updateSessionRules(
+        {
+            "removeRuleIds": [1]
+        }
+    )
+});
+
 chrome.action.onClicked.addListener(tab => {
     apply_rules = []
     undo_flag = false;
@@ -86,16 +94,4 @@ chrome.action.onClicked.addListener(tab => {
     })
 
     chrome.tabs.reload(tab.id);
-
-    // not working
-    if (undo_flag) {
-        console.log('delete undo')
-        // delete undo rule
-        chrome.declarativeNetRequest.updateSessionRules(
-            {
-                "removeRuleIds": [1]
-            }
-        )
-    }
-
 });
