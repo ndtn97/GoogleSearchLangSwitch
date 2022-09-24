@@ -6,20 +6,6 @@
     "background": {
         "service_worker": "/js/background.js"
     },
-    "declarative_net_request": {
-        "rule_resources": [
-            {
-                "id": "eng_search",
-                "enabled": true,
-                "path": "/rules/eng_search.json"
-            },
-            {
-                "id": "normal_search",
-                "enabled": false,
-                "path": "/rules/normal_search.json"
-            }
-        ]
-    },
     "permissions": [
         "declarativeNetRequest"
     ],
@@ -35,5 +21,8 @@
                 "/js/page.js"
             ]
         }
-    ]
+    ],
+    "action": {
+        "default_icon": "/images/icon_off.png"
+    }
 }
