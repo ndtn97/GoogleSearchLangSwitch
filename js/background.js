@@ -66,7 +66,7 @@ function updateIcon(tabId, url) {
     });
   } else {
     chrome.action.setIcon({
-      path: "/images/icon.png",
+      path: "/images/icon_disabled.png",
     });
   }
 }
