@@ -27,7 +27,8 @@
             ],
             "css": [
                 "/css/clean-switch.css"
-            ]
+            ],
+            "run_at": "document_end"
         }
     ]
 }
