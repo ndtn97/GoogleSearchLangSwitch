@@ -44,31 +44,19 @@ rule_undo = {
   },
 };
 
-function updateIcon(tabId, url) {
-  if (url.match("google.com/search")) {
-    chrome.declarativeNetRequest.getSessionRules((rules) => {
-      rules.forEach((rule) => {
-        if (rule.id == 2) {
-          tabIds = rule.condition.tabIds;
-          if (tabIds.includes(tabId)) {
-            // enabled
-            icon = "/images/icon_on.png";
-          } else {
-            // diabled
-            icon = "/images/icon_off.png";
-          }
-
-          chrome.action.setIcon({
-            path: icon,
-          });
-        }
-      });
+function updateToggleSwitch(tabId) {
+  chrome.declarativeNetRequest.getSessionRules((rules) => {
+    enabled = false;
+    rules.forEach((rule) => {
+      if (rule.id == 2) {
+        enabled = rule.condition.tabIds.includes(tabId);
+        chrome.tabs.sendMessage(tabId, {
+          type: "switch_stat",
+          enabled: enabled,
+        });
+      }
     });
-  } else {
-    chrome.action.setIcon({
-      path: "/images/icon_disabled.png",
-    });
-  }
+  });
 }
 
 chrome.declarativeNetRequest.updateSessionRules({
@@ -76,53 +64,74 @@ chrome.declarativeNetRequest.updateSessionRules({
   addRules: [rule],
 });
 
+function enable(tab) {
+  chrome.declarativeNetRequest.getSessionRules((rules) => {
+    rules.forEach((rule) => {
+      if (rule.id == 2) {
+        tabIds = rule.condition.tabIds;
+        // already enabled -> continue
+        if (!tabIds.includes(tab.id)) {
+          // diabled -> enable
+          rule.condition.tabIds.push(tab.id);
+
+          // update rule
+          chrome.declarativeNetRequest.updateSessionRules({
+            removeRuleIds: [2],
+            addRules: [rule],
+          });
+
+          // reload
+          chrome.tabs.reload(tab.id);
+        }
+      }
+    });
+  });
+}
+
+function disable(tab) {
+  chrome.declarativeNetRequest.getSessionRules((rules) => {
+    rules.forEach((rule) => {
+      if (rule.id == 2) {
+        tabIds = rule.condition.tabIds;
+        // already enabled -> disable
+        if (tabIds.includes(tab.id)) {
+          idx = tabIds.indexOf(tab.id);
+          rule.condition.tabIds.splice(idx, 1);
+          apply_rules = [rule_undo, rule];
+
+          // update rule
+          chrome.declarativeNetRequest.updateSessionRules({
+            removeRuleIds: [2],
+            addRules: apply_rules,
+          });
+
+          // reload
+          chrome.tabs.reload(tab.id);
+        }
+      }
+    });
+  });
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   tab = sender.tab;
   thisExtensionId = chrome.runtime.id;
   sendExtensionId = sender.id;
 
   if (thisExtensionId == sendExtensionId) {
-    if (request.search) {
+    if (request.type == "page" && request.search) {
       chrome.declarativeNetRequest.updateSessionRules({
         removeRuleIds: [1],
       });
     }
+
+    if (request.type == "switch") {
+      if (request.enable) {
+        enable(tab);
+      } else {
+        disable(tab);
+      }
+    }
   }
-  updateIcon(tab.id, tab.url);
-})
-
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    updateIcon(activeInfo.tabId, tab.url);
-  });
-});
-
-chrome.action.onClicked.addListener((tab) => {
-  if (tab.url.match("google.com/search")) {
-    chrome.declarativeNetRequest.getSessionRules((rules) => {
-      apply_rules = [];
-      rules.forEach((rule) => {
-        tabIds = rule.condition.tabIds;
-        // already enabled -> disable
-        if (tabIds.includes(tab.id)) {
-          idx = tabIds.indexOf(tab.id);
-          rule.condition.tabIds.splice(idx, 1);
-          apply_rules.push(rule_undo);
-        } else {
-          // diabled -> enable
-          rule.condition.tabIds.push(tab.id);
-        }
-        apply_rules.push(rule);
-      });
-
-      // update rule
-      chrome.declarativeNetRequest.updateSessionRules({
-        removeRuleIds: [2],
-        addRules: apply_rules,
-      });
-
-      // reload
-      chrome.tabs.reload(tab.id);
-    });
-  }
+  updateToggleSwitch(tab.id);
 });
