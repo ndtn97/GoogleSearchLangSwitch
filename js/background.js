@@ -76,15 +76,20 @@ chrome.declarativeNetRequest.updateSessionRules({
   addRules: [rule],
 });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  // TODO too much exec ?
-  if (tab.url.match("google.com/search")) {
-    chrome.declarativeNetRequest.updateSessionRules({
-      removeRuleIds: [1],
-    });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  tab = sender.tab;
+  thisExtensionId = chrome.runtime.id;
+  sendExtensionId = sender.id;
+
+  if (thisExtensionId == sendExtensionId) {
+    if (request.search) {
+      chrome.declarativeNetRequest.updateSessionRules({
+        removeRuleIds: [1],
+      });
+    }
   }
   updateIcon(tab.id, tab.url);
-});
+})
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.get(activeInfo.tabId, (tab) => {
