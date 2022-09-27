@@ -24,6 +24,9 @@
             ],
             "js": [
                 "/js/page.js"
+            ],
+            "css": [
+                "/css/clean-switch.css"
             ]
         }
     ]
