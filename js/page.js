@@ -18,9 +18,9 @@ function injectSwitch() {
 
 var observer = new MutationObserver(function (mutations) {
   Array.prototype.forEach.call(mutations, function (mutation) {
-    if (mutation.type === 'childList') {
+    if (mutation.type === "childList") {
       Array.prototype.forEach.call(mutation.addedNodes, function (node) {
-        if (node.id === 'result-stats') {
+        if (node.id === "result-stats") {
           injectSwitch();
           observer.disconnect();
         }
@@ -33,7 +33,7 @@ observer.observe(document, {
   attributes: true,
   childList: true,
   characterData: true,
-  subtree: true
+  subtree: true,
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
