@@ -8,12 +8,15 @@
     },
     "permissions": [
         "declarativeNetRequest",
-        "tabs"
+        "tabs",
+        "storage"
     ],
     "host_permissions": [
         "*://www.google.com/search*"
     ],
-    "action": {},
+    "action": {
+        "default_popup": "/html/popup.html"
+    },
     "icons": {
         "128": "/images/icon.png"
     },

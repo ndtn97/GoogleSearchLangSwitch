@@ -1,3 +1,23 @@
+chrome.runtime.onInstalled.addListener(() => {
+  params = {
+    label: "EN",
+    gl: "us",
+    hl: "en",
+  };
+  chrome.storage.sync.get(["label", "gl", "hl"], (items) => {
+    if (items.gl !== undefined) {
+      params.gl = items.gl;
+    }
+    if (items.hl !== undefined) {
+      params.hl = items.hl;
+    }
+    if (items.label !== undefined) {
+      params.label = items.label;
+    }
+  });
+  chrome.storage.sync.set(params);
+});
+
 rule = {
   id: 2,
   action: {
@@ -44,6 +64,40 @@ rule_undo = {
   },
 };
 
+function updateRuleParams(gl, hl) {
+  if (gl === undefined) {
+    gl = "us";
+  }
+  if (hl === undefined) {
+    hl = "en";
+  }
+
+  chrome.declarativeNetRequest.getSessionRules((rules) => {
+    rules.forEach((rule) => {
+      if (rule.id == 2) {
+        params = [
+          {
+            key: "gl",
+            value: gl,
+          },
+          {
+            key: "hl",
+            value: hl,
+          },
+        ];
+        rule.action.redirect.transform.queryTransform.addOrReplaceParams =
+          params;
+
+        // update rule
+        chrome.declarativeNetRequest.updateSessionRules({
+          removeRuleIds: [2],
+          addRules: [rule],
+        });
+      }
+    });
+  });
+}
+
 function updateToggleSwitch(tabId) {
   chrome.declarativeNetRequest.getSessionRules((rules) => {
     enabled = false;
@@ -59,10 +113,11 @@ function updateToggleSwitch(tabId) {
   });
 }
 
-chrome.declarativeNetRequest.updateSessionRules({
-  removeRuleIds: [2],
-  addRules: [rule],
-});
+function getRulesAndApply() {
+  chrome.storage.sync.get(["gl", "hl"], (items) => {
+    updateRuleParams(items.gl, items.hl);
+  });
+}
 
 function enable(tab) {
   chrome.declarativeNetRequest.getSessionRules((rules) => {
@@ -123,6 +178,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       chrome.declarativeNetRequest.updateSessionRules({
         removeRuleIds: [1],
       });
+      updateToggleSwitch(tab.id);
     }
 
     if (request.type == "switch") {
@@ -131,7 +187,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       } else {
         disable(tab);
       }
+      updateToggleSwitch(tab.id);
+    }
+
+    if (request.type == "setting_params") {
+      chrome.storage.sync.set(
+        { label: request.label, gl: request.gl, hl: request.hl },
+        () => {
+          updateRuleParams(request.gl, request.hl);
+        }
+      );
     }
   }
-  updateToggleSwitch(tab.id);
 });
+
+chrome.storage.sync.onChanged.addListener((changes, areaName) => {
+  getRulesAndApply();
+});
+
+// init
+getRulesAndApply();

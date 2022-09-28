@@ -1,12 +1,16 @@
 function injectSwitch() {
   stats_html = document.getElementById("result-stats").innerHTML;
   toggle_btn_html = `
-  <span>EN <label class="cl-switch cl-switch-small cl-switch-green"><input type="checkbox" id="toggle_btn"><span class="switcher">
+  <span><span id="sw_label"></span>&nbsp;<label class="cl-switch cl-switch-small cl-switch-green"><input type="checkbox" id="toggle_btn"><span class="switcher">
   </span></label>&nbsp;</span>
   `;
 
   document.getElementById("result-stats").innerHTML =
     toggle_btn_html + stats_html;
+
+  chrome.storage.sync.get(["label"], (items) => {
+    document.getElementById("sw_label").textContent = items.label;
+  });
 
   chrome.runtime.sendMessage({ type: "page", search: true });
 
