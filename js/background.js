@@ -206,4 +206,7 @@ chrome.storage.sync.onChanged.addListener((changes, areaName) => {
 });
 
 // init
+chrome.declarativeNetRequest.updateSessionRules({
+  addRules: [rule],
+});
 getRulesAndApply();
