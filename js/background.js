@@ -1,8 +1,10 @@
 chrome.runtime.onInstalled.addListener(() => {
   params = {
-    label: "EN", gl: "us", hl: "en"
-  }
-  chrome.storage.sync.get(['label', 'gl', 'hl'], (items) => {
+    label: "EN",
+    gl: "us",
+    hl: "en",
+  };
+  chrome.storage.sync.get(["label", "gl", "hl"], (items) => {
     if (items.gl !== undefined) {
       params.gl = items.gl;
     }
@@ -14,7 +16,7 @@ chrome.runtime.onInstalled.addListener(() => {
     }
   });
   chrome.storage.sync.set(params);
-})
+});
 
 rule = {
   id: 2,
@@ -63,12 +65,11 @@ rule_undo = {
 };
 
 function updateRuleParams(gl, hl) {
-
   if (gl === undefined) {
-    gl = "us"
+    gl = "us";
   }
   if (hl === undefined) {
-    hl = "en"
+    hl = "en";
   }
 
   chrome.declarativeNetRequest.getSessionRules((rules) => {
@@ -83,8 +84,9 @@ function updateRuleParams(gl, hl) {
             key: "hl",
             value: hl,
           },
-        ]
-        rule.action.redirect.transform.queryTransform.addOrReplaceParams = params
+        ];
+        rule.action.redirect.transform.queryTransform.addOrReplaceParams =
+          params;
 
         // update rule
         chrome.declarativeNetRequest.updateSessionRules({
@@ -112,8 +114,8 @@ function updateToggleSwitch(tabId) {
 }
 
 function getRulesAndApply() {
-  chrome.storage.sync.get(['gl', 'hl'], (items) => {
-    updateRuleParams(items.gl, items.hl)
+  chrome.storage.sync.get(["gl", "hl"], (items) => {
+    updateRuleParams(items.gl, items.hl);
   });
 }
 
@@ -189,16 +191,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     if (request.type == "setting_params") {
-      chrome.storage.sync.set({ label: request.label, gl: request.gl, hl: request.hl }, () => {
-        updateRuleParams(request.gl, request.hl);
-      });
+      chrome.storage.sync.set(
+        { label: request.label, gl: request.gl, hl: request.hl },
+        () => {
+          updateRuleParams(request.gl, request.hl);
+        }
+      );
     }
   }
 });
 
 chrome.storage.sync.onChanged.addListener((changes, areaName) => {
   getRulesAndApply();
-})
+});
 
 // init
 getRulesAndApply();

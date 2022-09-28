@@ -10,7 +10,7 @@ function injectSwitch() {
 
   chrome.storage.sync.get(["label"], (items) => {
     document.getElementById("sw_label").textContent = items.label;
-  })
+  });
 
   chrome.runtime.sendMessage({ type: "page", search: true });
 
