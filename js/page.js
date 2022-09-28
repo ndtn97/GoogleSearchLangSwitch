@@ -1,17 +1,39 @@
-stats_html = document.getElementById("result-stats").innerHTML;
-toggle_btn_html = `
-<span>EN <label class="cl-switch cl-switch-small cl-switch-green"><input type="checkbox" id="toggle_btn"><span class="switcher">
-</span></label>&nbsp;</span>
-`;
+function injectSwitch() {
+  stats_html = document.getElementById("result-stats").innerHTML;
+  toggle_btn_html = `
+  <span>EN <label class="cl-switch cl-switch-small cl-switch-green"><input type="checkbox" id="toggle_btn"><span class="switcher">
+  </span></label>&nbsp;</span>
+  `;
 
-document.getElementById("result-stats").innerHTML =
-  toggle_btn_html + stats_html;
+  document.getElementById("result-stats").innerHTML =
+    toggle_btn_html + stats_html;
 
-chrome.runtime.sendMessage({ type: "page", search: true });
+  chrome.runtime.sendMessage({ type: "page", search: true });
 
-toggle_btn = document.getElementById("toggle_btn");
-toggle_btn.addEventListener("change", () => {
-  chrome.runtime.sendMessage({ type: "switch", enable: toggle_btn.checked });
+  toggle_btn = document.getElementById("toggle_btn");
+  toggle_btn.addEventListener("change", () => {
+    chrome.runtime.sendMessage({ type: "switch", enable: toggle_btn.checked });
+  });
+}
+
+var observer = new MutationObserver(function (mutations) {
+  Array.prototype.forEach.call(mutations, function (mutation) {
+    if (mutation.type === 'childList') {
+      Array.prototype.forEach.call(mutation.addedNodes, function (node) {
+        if (node.id === 'result-stats') {
+          injectSwitch();
+          observer.disconnect();
+        }
+      });
+    }
+  });
+});
+
+observer.observe(document, {
+  attributes: true,
+  childList: true,
+  characterData: true,
+  subtree: true
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
