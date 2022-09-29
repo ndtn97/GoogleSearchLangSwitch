@@ -61,6 +61,7 @@ rule_undo = {
   condition: {
     urlFilter: "google.com",
     resourceTypes: ["main_frame"],
+    tabIds: [chrome.tabs.TAB_ID_NONE],
   },
 };
 
@@ -103,10 +104,9 @@ function updateToggleSwitch(tabId) {
     enabled = false;
     rules.forEach((rule) => {
       if (rule.id == 2) {
-        enabled = rule.condition.tabIds.includes(tabId);
         chrome.tabs.sendMessage(tabId, {
           type: "switch_stat",
-          enabled: enabled,
+          enabled: rule.condition.tabIds.includes(tabId),
         });
       }
     });
@@ -145,26 +145,33 @@ function enable(tab) {
 
 function disable(tab) {
   chrome.declarativeNetRequest.getSessionRules((rules) => {
+    apply_rules = []
     rules.forEach((rule) => {
       if (rule.id == 2) {
         tabIds = rule.condition.tabIds;
         // already enabled -> disable
         if (tabIds.includes(tab.id)) {
+          // disable rule
           idx = tabIds.indexOf(tab.id);
           rule.condition.tabIds.splice(idx, 1);
-          apply_rules = [rule_undo, rule];
-
-          // update rule
-          chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [2],
-            addRules: apply_rules,
-          });
-
-          // reload
-          chrome.tabs.reload(tab.id);
+        }
+      } else {
+        tabIds = rule.condition.tabIds;
+        if (!tabIds.includes(tab.id)) {
+          rule.condition.tabIds.push(tab.id);
         }
       }
+      apply_rules.push(rule);
     });
+
+    // update rule
+    chrome.declarativeNetRequest.updateSessionRules({
+      removeRuleIds: [1, 2],
+      addRules: apply_rules,
+    });
+
+    // reload
+    chrome.tabs.reload(tab.id);
   });
 }
 
@@ -174,10 +181,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   sendExtensionId = sender.id;
 
   if (thisExtensionId == sendExtensionId) {
-    if (request.type == "page" && request.search) {
-      chrome.declarativeNetRequest.updateSessionRules({
-        removeRuleIds: [1],
-      });
+    if (request.type == "page") {
+      chrome.declarativeNetRequest.getSessionRules((rules) => {
+        rules.forEach((rule) => {
+          if (rule.id == 1) {
+            tabIds = rule.condition.tabIds;
+            if (tabIds.includes(tab.id)) {
+              // disable rule
+              idx = tabIds.indexOf(tab.id);
+              rule.condition.tabIds.splice(idx, 1);
+
+              // update rule
+              chrome.declarativeNetRequest.updateSessionRules({
+                removeRuleIds: [1],
+                addRules: [rule]
+              });
+            }
+          }
+        })
+      })
       updateToggleSwitch(tab.id);
     }
 
@@ -199,7 +221,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       );
     }
   }
-});
+})
 
 chrome.storage.sync.onChanged.addListener((changes, areaName) => {
   getRulesAndApply();
@@ -207,6 +229,6 @@ chrome.storage.sync.onChanged.addListener((changes, areaName) => {
 
 // init
 chrome.declarativeNetRequest.updateSessionRules({
-  addRules: [rule],
+  addRules: [rule, rule_undo],
 });
 getRulesAndApply();
