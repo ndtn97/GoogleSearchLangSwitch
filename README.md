@@ -2,7 +2,7 @@
 
 This chrome extension adds language switch to google search results page
 
-- when SW is off: Your default language is applied configured in your google settings
+- when SW is off: Your default language is applied that configured in your google settings
 - when SW is on: Force your configured language & country to google search
 
 ## Demo
