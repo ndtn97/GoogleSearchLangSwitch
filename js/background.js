@@ -145,7 +145,7 @@ function enable(tab) {
 
 function disable(tab) {
   chrome.declarativeNetRequest.getSessionRules((rules) => {
-    apply_rules = []
+    apply_rules = [];
     rules.forEach((rule) => {
       if (rule.id == 2) {
         tabIds = rule.condition.tabIds;
@@ -194,12 +194,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               // update rule
               chrome.declarativeNetRequest.updateSessionRules({
                 removeRuleIds: [1],
-                addRules: [rule]
+                addRules: [rule],
               });
             }
           }
-        })
-      })
+        });
+      });
       updateToggleSwitch(tab.id);
     }
 
@@ -221,7 +221,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       );
     }
   }
-})
+});
 
 chrome.storage.sync.onChanged.addListener((changes, areaName) => {
   getRulesAndApply();
