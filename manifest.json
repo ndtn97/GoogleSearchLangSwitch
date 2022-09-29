@@ -1,14 +1,13 @@
 {
-    "name": "Google Lang Switch",
-    "description": "",
-    "version": "0.0",
+    "name": "Google Search Lang Switch",
+    "description": "Easy switching search language on google.com",
+    "version": "0.0.1",
     "manifest_version": 3,
     "background": {
         "service_worker": "/js/background.js"
     },
     "permissions": [
         "declarativeNetRequest",
-        "tabs",
         "storage"
     ],
     "host_permissions": [
