@@ -12,7 +12,7 @@ function injectSwitch() {
     document.getElementById("sw_label").textContent = items.label;
   });
 
-  chrome.runtime.sendMessage({ type: "page", search: true });
+  chrome.runtime.sendMessage({ type: "page" });
 
   toggle_btn = document.getElementById("toggle_btn");
   toggle_btn.addEventListener("change", () => {
