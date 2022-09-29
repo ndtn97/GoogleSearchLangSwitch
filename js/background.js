@@ -40,7 +40,7 @@ rule = {
     },
   },
   condition: {
-    urlFilter: "google.com",
+    urlFilter: "*://www.google.com/search*",
     resourceTypes: ["main_frame"],
     tabIds: [chrome.tabs.TAB_ID_NONE],
   },
@@ -59,7 +59,7 @@ rule_undo = {
     },
   },
   condition: {
-    urlFilter: "google.com",
+    urlFilter: "*://www.google.com/search*",
     resourceTypes: ["main_frame"],
     tabIds: [chrome.tabs.TAB_ID_NONE],
   },
