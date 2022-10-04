@@ -13,7 +13,7 @@ https://user-images.githubusercontent.com/32271862/193069539-05ac639d-82fb-4c74-
 ## Install
 
 ### Chrome Webstore
-TODO
+[Webstore](https://chrome.google.com/webstore/detail/google-search-lang-switch/dfnccooblhkmhflhhlghhclkcdnlpfap)
 
 ### Install manually
 1. Download [main branch](https://github.com/ndtn97/GoogleSearchLangSwitch/archive/refs/heads/main.zip) and unzip
