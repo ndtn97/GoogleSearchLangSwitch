@@ -1,13 +1,8 @@
-function injectSwitch() {
-  stats_html = document.getElementById("result-stats").innerHTML;
-  toggle_btn_html = `
-  <span><span id="sw_label"></span>&nbsp;<label class="cl-switch cl-switch-small cl-switch-green"><input type="checkbox" id="toggle_btn"><span class="switcher">
-  </span></label>&nbsp;</span>
-  `;
+btn_html = `
+<span id="sw_label"></span>&nbsp;<label class="cl-switch cl-switch-small cl-switch-green"><input type="checkbox" id="toggle_btn"><span class="switcher"></span></label>&nbsp;
+`;
 
-  document.getElementById("result-stats").innerHTML =
-    toggle_btn_html + stats_html;
-
+function postProcess() {
   chrome.storage.sync.get(["label"], (items) => {
     document.getElementById("sw_label").textContent = items.label;
   });
@@ -20,12 +15,35 @@ function injectSwitch() {
   });
 }
 
+function injectSwitchToStat() {
+  stats_html = document.getElementById("result-stats").innerHTML;
+  toggle_btn_html = `<span>${btn_html}</span>`;
+  document.getElementById(
+    "result-stats",
+  ).innerHTML = `<span>${btn_html}</span> ${stats_html}`;
+  postProcess();
+}
+
+function injectSwitchToNav(cls_name, btn_opt) {
+  bar_html = document.getElementsByClassName(cls_name)[0].innerHTML;
+  document.getElementsByClassName(
+    cls_name,
+  )[0].innerHTML = `<div ${btn_opt}> ${btn_html} </div> ${bar_html}`;
+  postProcess();
+}
+
 var observer = new MutationObserver(function (mutations) {
   Array.prototype.forEach.call(mutations, function (mutation) {
     if (mutation.type === "childList") {
       Array.prototype.forEach.call(mutation.addedNodes, function (node) {
-        if (node.id === "result-stats") {
-          injectSwitch();
+        if (node.id === "hdtb-tls") {
+          injectSwitchToNav(
+            "MUFPAc",
+            `class="hdtb-mitem" aria-current="page" style="margin-left: 10px;"`,
+          );
+          observer.disconnect();
+        } else if (node.id === "bqHHPb") {
+          injectSwitchToNav("IUOThf", `class="nPDzT T3FoJb"`);
           observer.disconnect();
         }
       });
@@ -38,6 +56,13 @@ observer.observe(document, {
   childList: true,
   characterData: true,
   subtree: true,
+});
+
+// fallback
+document.addEventListener("DOMContentLoaded", function () {
+  if (document.getElementById("sw_label") == null) {
+    injectSwitchToStat();
+  }
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
