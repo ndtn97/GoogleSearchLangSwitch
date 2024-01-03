@@ -217,7 +217,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         { label: request.label, gl: request.gl, hl: request.hl },
         () => {
           updateRuleParams(request.gl, request.hl);
-        }
+        },
       );
     }
   }
