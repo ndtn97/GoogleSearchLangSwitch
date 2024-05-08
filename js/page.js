@@ -16,34 +16,32 @@ function postProcess() {
 }
 
 function injectSwitchToStat() {
-  stats_html = document.getElementById("result-stats").innerHTML;
-  toggle_btn_html = `<span>${btn_html}</span>`;
-  document.getElementById(
-    "result-stats",
-  ).innerHTML = `<span>${btn_html}</span> ${stats_html}`;
-  postProcess();
+  if (document.getElementById("sw_label") == null) {
+    stats_html = document.getElementById("result-stats").innerHTML;
+    toggle_btn_html = `<span>${btn_html}</span>`;
+    document.getElementById(
+      "result-stats"
+    ).innerHTML = `<span>${btn_html}</span> ${stats_html}`;
+    postProcess();
+  }
 }
 
 function injectSwitchToNav(cls_name, btn_opt) {
-  bar_html = document.getElementsByClassName(cls_name)[0].innerHTML;
-  document.getElementsByClassName(
-    cls_name,
-  )[0].innerHTML = `<div ${btn_opt}> ${btn_html} </div> ${bar_html}`;
-  postProcess();
+  if (document.getElementById("sw_label") == null) {
+    bar_html = document.getElementsByClassName(cls_name)[0].innerHTML;
+    document.getElementsByClassName(
+      cls_name
+    )[0].innerHTML = `<div ${btn_opt}> ${btn_html} </div> ${bar_html}`;
+    postProcess();
+  }
 }
 
 var observer = new MutationObserver(function (mutations) {
   Array.prototype.forEach.call(mutations, function (mutation) {
     if (mutation.type === "childList") {
       Array.prototype.forEach.call(mutation.addedNodes, function (node) {
-        if (node.id === "hdtb-tls") {
-          injectSwitchToNav(
-            "MUFPAc",
-            `class="hdtb-mitem" aria-current="page" style="margin-left: 10px;"`,
-          );
-          observer.disconnect();
-        } else if (node.id === "bqHHPb") {
-          injectSwitchToNav("IUOThf", `class="nPDzT T3FoJb"`);
+        if (node.classList && node.classList.contains("qogDvd")) {
+          injectSwitchToNav("crJ18e", "");
           observer.disconnect();
         }
       });
@@ -60,9 +58,7 @@ observer.observe(document, {
 
 // fallback
 document.addEventListener("DOMContentLoaded", function () {
-  if (document.getElementById("sw_label") == null) {
-    injectSwitchToStat();
-  }
+  injectSwitchToStat();
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
